@@ -25,6 +25,12 @@ export default function Register() {
   const db = getFirestore();
 
   const handleSubmit = async () => {
+
+    if (password.length < 6) {
+      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
     if (email && password && name) {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -37,16 +43,26 @@ export default function Register() {
           phone: phone, // Adiciona o telefone aos dados do usuário
         });
 
-        // Exibe uma mensagem de sucesso
         Alert.alert('Sucesso', 'Cadastro realizado com sucesso!', [
           {
             text: 'OK',
-            onPress: () => router.push('/login'), // Redireciona para a tela de login
+            onPress: () => router.push('/login'),
           },
         ]);
       } catch (err) {
-        console.log('got error: ', err.message);
+        console.log('Erro: ', err.message);
+
+        // Tratamento de erros do Firebase
+        if (err.code === 'auth/weak-password') {
+          Alert.alert('Erro', 'A senha é muito fraca. Escolha uma senha mais forte.');
+        } else if (err.code === 'auth/email-already-in-use') {
+          Alert.alert('Erro', 'Este e-mail já está em uso. Tente outro e-mail.');
+        } else {
+          Alert.alert('Erro', 'Ocorreu um erro ao registrar. Tente novamente.');
+        }
       }
+    } else {
+      Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
     }
   };
 
