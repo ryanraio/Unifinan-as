@@ -25,7 +25,7 @@ export default function ProfileScreen() {
     Poppins_700Bold,
     Roboto_700Bold,
     Roboto_400Regular,
-});
+  });
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -70,7 +70,7 @@ export default function ProfileScreen() {
           />
           <View>
             <Text style={styles.profileName}>{userName}</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/editar_dados')}>
               <Text style={styles.editInfoText}>Editar informações pessoais</Text>
             </TouchableOpacity>
           </View>
@@ -80,32 +80,32 @@ export default function ProfileScreen() {
       <View style={styles.container1}>
         {/* Card Section */}
         <TouchableOpacity onPress={() => router.push('/(tabs)/premium')}>
-        <LinearGradient colors={['#5d3fd3', '#d9f0ff']}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={styles.cardContainer}>
-          <View style={styles.circle2}>
-            <Image
-              source={require('../../logo.png')}
-              style={styles.iconEye}
-            />
-          </View>
-          <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-            <Text style={styles.cardText} numberOfLines={2}>
-              Assine a <Text style={styles.cardText2}>UniFinanças Premium</Text>
-            </Text>
-            <Text style={styles.cardSubtitle} numberOfLines={1}>
-              para uma experiência completa
-            </Text>
-          </View>
-          <TouchableOpacity>
-            <Text style={styles.cardText1} numberOfLines={1}>›</Text>
-          </TouchableOpacity>
-          <View style={styles.balanceContainer}>
-            <View style={styles.hiddenBalance}>
+          <LinearGradient colors={['#5d3fd3', '#d9f0ff']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.cardContainer}>
+            <View style={styles.circle2}>
+              <Image
+                source={require('../../logo.png')}
+                style={styles.iconEye}
+              />
             </View>
-          </View>
-        </LinearGradient>
+            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+              <Text style={styles.cardText} numberOfLines={2}>
+                Assine a <Text style={styles.cardText2}>UniFinanças Premium</Text>
+              </Text>
+              <Text style={styles.cardSubtitle} numberOfLines={1}>
+                para uma experiência completa
+              </Text>
+            </View>
+            <TouchableOpacity>
+              <Text style={styles.cardText1} numberOfLines={1}>›</Text>
+            </TouchableOpacity>
+            <View style={styles.balanceContainer}>
+              <View style={styles.hiddenBalance}>
+              </View>
+            </View>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
@@ -210,13 +210,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-    marginLeft: 20,
   },
   editInfoText: {
     color: '#fff',
     marginTop: 5,
     textDecorationLine: 'underline',
-    marginLeft: 20,
     fontSize: 16,
   },
   groupsContainer: {
@@ -249,16 +247,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#d9d9d9', // Cor de fundo do círculo
-},
-circle2: {
-  width: 40,
-  height: 40,
-  borderRadius: 25, // Deixa o container redondo
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#d9d9d9', // Cor de fundo do círculo
-  marginRight: 23,
-},
+  },
+  circle2: {
+    width: 40,
+    height: 40,
+    borderRadius: 25, // Deixa o container redondo
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#d9d9d9', // Cor de fundo do círculo
+    marginRight: 23,
+  },
   groupIcon: {
     width: 30, // Tamanho da imagem dentro do círculo
     height: 30,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { Roboto_400Regular } from '@expo-google-fonts/roboto';
@@ -33,8 +33,8 @@ export default function Login() {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           await AsyncStorage.setItem('userName', userData.name);
-          await AsyncStorage.setItem('isUserLoggedIn', 'true'); // Certifique-se de que o valor seja uma string
-          router.replace('/dashboard'); // Redireciona para a tela principal após o login
+          await AsyncStorage.setItem('isUserLoggedIn', 'true'); 
+          router.replace('/dashboard'); 
         }
       } catch (err) {
         console.log('got error: ', err.message);
@@ -60,6 +60,10 @@ export default function Login() {
 
   return (
     <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView 
+        style={styles.container} 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
       <View style={styles.textContainer}>
         <Text style={styles.welcomeText}>Bem vindo de volta</Text>
         <Text style={styles.titleText}>Insira o seu e-mail e sua senha</Text>
@@ -100,6 +104,7 @@ export default function Login() {
           <Text style={styles.skipText}>Cadastre-se</Text>
         </TouchableOpacity>
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

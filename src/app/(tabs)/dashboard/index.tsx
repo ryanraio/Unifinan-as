@@ -7,6 +7,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import Entypo from '@expo/vector-icons/Entypo';
+import { ProgressCircle } from 'react-native-svg-charts';
+import { Svg, Text as SvgText } from 'react-native-svg'; // Adicione a importação de Svg
 import {
     View,
     Text,
@@ -19,8 +21,9 @@ import {
 } from 'react-native';
 
 export default function HomeScreen() {
-
     const [userName, setUserName] = useState('');
+    const [saldo, setSaldo] = useState(null); // Estado para o saldo
+    const [isSaldoOculto, setIsSaldoOculto] = useState(true); // Estado para controle do saldo oculto/visível
 
     const navigation = useNavigation();
     const router = useRouter();
@@ -41,93 +44,129 @@ export default function HomeScreen() {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    setUserName(userData.name);
+                    const firstName = userData.name.split(' ')[0]; // Pega apenas o primeiro nome
+                    setUserName(firstName);
+                }
+            }
+        };
+
+        // Função para buscar o saldo do Firebase
+        const fetchSaldo = async () => {
+            const db = getFirestore();
+            const user = auth.currentUser;
+
+            if (user) {
+                const saldoRef = doc(db, 'users', user.uid);
+                const saldoSnap = await getDoc(saldoRef);
+
+                if (saldoSnap.exists()) {
+                    const saldoData = saldoSnap.data().balance; // Supondo que o campo seja 'balance'
+                    setSaldo(saldoData);
                 }
             }
         };
 
         fetchUserName();
+        fetchSaldo();
     }, []);
+
+    // Função para alternar visibilidade do saldo
+    const toggleSaldoVisibilidade = () => {
+        setIsSaldoOculto(!isSaldoOculto);
+    };
 
     return (
         <ScrollView>
-        <View style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#1c2120" />
-            {/* Top Section - User Info */}
-            <View style={styles.userInfoContainer}>
-                <View style={styles.userText}>
-                    <Text style={styles.greetingText}>
-                        Olá, <Text style={styles.nameText}>{userName}</Text>
-                    </Text>
-                    <Text style={styles.subText}>É bom te ter de volta</Text>
+            <View style={styles.container}>
+                <StatusBar barStyle="light-content" backgroundColor="#1c2120" />
+                {/* Top Section - User Info */}
+                <View style={styles.userInfoContainer}>
+                    <View style={styles.userText}>
+                        <Text style={styles.greetingText}>
+                            Olá, <Text style={styles.nameText}>{userName}</Text>
+                        </Text>
+                        <Text style={styles.subText}>É bom te ter de volta</Text>
+                    </View>
+                    <Image
+                        source={{ uri: 'https://placehold.co/50x50' }}
+                        style={styles.userImage}
+                    />
                 </View>
-                <Image
-                    source={{ uri: 'https://placehold.co/50x50' }}
-                    style={styles.userImage}
-                />
-            </View>
 
-            <View style={styles.container1}>
-                {/* Card Section */}
-                <LinearGradient
-                    colors={['#5d3fd3', '#d9f0ff']}
-                    style={[styles.cardContainer, { transform: [{ rotate: '-3deg' }] }]}
-                >
-                    <View style={[styles.overlay, { transform: [{ rotate: '3deg' }] }]} />
-                    <Text style={[styles.cardText, { transform: [{ rotate: '3deg' }] }]}>Saldo atual</Text>
-                    <View style={[styles.balanceContainer, { transform: [{ rotate: '3deg' }] }]}>
-                        <View style={styles.hiddenBalance}>
-                            <Text style={styles.hiddenText}>*******</Text>
-                            <TouchableOpacity style={{ marginLeft: '20%', marginTop: -12 }}>
-                                <Entypo name="eye-with-line" size={24} color="white" />
+                <View style={styles.container1}>
+                    {/* Card Section */}
+                    <LinearGradient
+                        colors={['#5d3fd3', '#d9f0ff']}
+                        style={[styles.cardContainer, { transform: [{ rotate: '-3deg' }] }]}
+                    >
+                        <View style={[styles.overlay, { transform: [{ rotate: '3deg' }] }]} />
+                        <Text style={[styles.cardText, { transform: [{ rotate: '3deg' }] }]}>Saldo atual</Text>
+                        <View style={[styles.balanceContainer, { transform: [{ rotate: '3deg' }] }]}>
+                            <View style={styles.hiddenBalance}>
+                                {/* Mostra o saldo se não estiver oculto, caso contrário mostra '*******' */}
+                                <Text style={styles.hiddenText}>
+                                    {isSaldoOculto ? '*******' : saldo !== null ? `R$ ${saldo}` : 'Carregando...'}
+                                </Text>
+
+                                {/* Botão para alternar a visibilidade do saldo */}
+                                <TouchableOpacity
+                                    style={{ marginLeft: '20%', marginTop: -12 }}
+                                    onPress={toggleSaldoVisibilidade} // Chama a função ao clicar
+                                >
+                                    {/* Ícone de olho ou olho com linha dependendo do estado */}
+                                    <Entypo
+                                        name={isSaldoOculto ? "eye-with-line" : "eye"}
+                                        size={24}
+                                        color="white"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        <TouchableOpacity style={[styles.learnMoreButton, { transform: [{ rotate: '3deg' }] }]} onPress={() => router.push('/(tabs)/saldo')}>
+                            <Text style={styles.learnMoreText}>Saiba mais</Text>
+                        </TouchableOpacity>
+                    </LinearGradient>
+
+                    {/* Groups Section */}
+                    <View style={styles.groupsContainer}>
+                        {/* Container para o título e o botão de criar grupo */}
+                        <View style={styles.groupsHeader}>
+                            <Text style={styles.sectionTitle}>Seus Grupos</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.createText}>+ Criar grupo</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
-                    <TouchableOpacity style={[styles.learnMoreButton, { transform: [{ rotate: '3deg' }] }]}>
-                        <Text style={styles.learnMoreText}>Saiba mais</Text>
-                    </TouchableOpacity>
-                </LinearGradient>
 
-                {/* Groups Section */}
-                <View style={styles.groupsContainer}>
-                    {/* Container para o título e o botão de criar grupo */}
-                    <View style={styles.groupsHeader}>
-                        <Text style={styles.sectionTitle}>Seus Grupos</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.createText}>+ Criar grupo</Text>
-                        </TouchableOpacity>
+                        {/* Grupos listados */}
+                        <View style={styles.groupsRow}>
+                            <GroupItem label="Casa" />
+                            <GroupItem label="Casal" />
+                            <GroupItem label="Faculdade" />
+                        </View>
                     </View>
 
-                    {/* Grupos listados */}
-                    <View style={styles.groupsRow}>
-                        <GroupItem label="Casa" />
-                        <GroupItem label="Casal" />
-                        <GroupItem label="Faculdade" />
-                    </View>
-                </View>
+                    {/* Goals Section */}
+                    <View style={styles.goalsContainer}>
+                        <View style={styles.goalsHeader}>
+                            <Text style={styles.sectionTitle}>Metas</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.createText}>+ Criar meta</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                {/* Goals Section */}
-                <View style={styles.goalsContainer}>
-                    <View style={styles.goalsHeader}>
-                        <Text style={styles.sectionTitle}>Metas</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.createText}>+ Criar meta</Text>
-                        </TouchableOpacity>
+                        <GoalItem
+                            label="Viagem"
+                            progress={0.5}
+                            remaining="R$ 150 restantes"
+                        />
+                        <GoalItem
+                            label="Casa"
+                            progress={0.15}
+                            remaining="R$ 10.000 restantes"
+                        />
                     </View>
-
-                    <GoalItem
-                        label="Viagem"
-                        progress={0.5}
-                        remaining="R$ 150 restantes"
-                    />
-                    <GoalItem
-                        label="Casa"
-                        progress={0.15}
-                        remaining="R$ 10.000 restantes"
-                    />
                 </View>
             </View>
-        </View>
         </ScrollView>
     );
 }
@@ -156,12 +195,36 @@ function GroupItem({ label }) {
 }
 
 function GoalItem({ label, progress, remaining }) {
+    const percentage = Math.round(progress * 100); // Calcule a porcentagem aqui
+
     return (
         <View style={styles.goalItem}>
+            {/* ProgressCircle e o texto dentro dele */}
+            <Svg height={40} width={40}>
+                <ProgressCircle
+                    style={{ height: 40, width: 40 }}
+                    progress={progress}
+                    progressColor={'rgb(134, 65, 244)'}
+                />
+                {/* Texto centralizado (número + %) */}
+                <SvgText
+                    x="53%"
+                    y="50%"
+                    textAnchor="middle"
+                    alignmentBaseline="middle"
+                    fontSize="10"
+                    fill="black"
+                >
+                    {`${percentage}%`}
+                </SvgText>
+            </Svg>
+
+            {/* Container para as informações da meta */}
             <View style={styles.goalInfo}>
                 <Text style={styles.goalLabel}>{label}</Text>
                 <Text style={styles.goalRemaining}>{remaining}</Text>
             </View>
+
             <TouchableOpacity>
                 <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
@@ -320,8 +383,8 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
         marginBottom: 16,
     },
     goalInfo: {
@@ -330,15 +393,12 @@ const styles = StyleSheet.create({
     goalLabel: {
         fontSize: 16,
         color: '#000',
+        marginLeft: -130,
     },
     goalRemaining: {
         fontSize: 14,
         color: '#000',
-    },
-    progressBar: {
-        height: 6,
-        width: '50%',
-        marginVertical: 8,
+        marginLeft: -130,
     },
     chevron: {
         fontSize: 30,
