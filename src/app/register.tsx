@@ -41,6 +41,7 @@ export default function Register() {
           email: email,
           dateOfBirth: data,
           phone: phone, // Adiciona o telefone aos dados do usuário
+          balance: 0,
         });
 
         Alert.alert('Sucesso', 'Cadastro realizado com sucesso!', [

@@ -95,6 +95,13 @@ export default function Login() {
         >
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
+
+        {/* <TouchableOpacity
+          style={styles.button}
+          onPress={handleResetIntro}
+        >
+          <Text style={styles.buttonText}>Resetar Introdução</Text>
+        </TouchableOpacity> */}
         
         <TouchableOpacity 
           style={styles.skipButton}
