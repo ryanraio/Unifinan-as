@@ -1,6 +1,7 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getAuth, initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';  // Adicione esta linha para importar Firestore
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
@@ -20,6 +21,9 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage)
 });
+
+// Inicializa o Firestore
+export const db = getFirestore(app);  // Adicione esta linha para inicializar Firestore
 
 // Inicializa o Analytics se for suportado
 let analytics;
